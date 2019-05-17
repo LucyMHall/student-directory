@@ -1,3 +1,4 @@
+require "csv"
 @students = []
 @counter = 0
 @success = "You have successfully "
@@ -88,16 +89,16 @@ end
 
 # Option 3
 def save_students
-  puts @success + "saved students"
   which_file?
-  open(@filename, mode = "w") do |file|
-    @students.each do |student|
-      student_data = [student[:name], student[:cohort]]
-      csv_line = student_data.join(", ")
-      file.puts csv_line
-    end
-  end
+  CSV.open("#{@filename}", "wb") do |csv|
+      @students.each do |student|
+        student_data = [student[:name], student[:cohort]]
+        csv << student_data
+      end
+  end 
+  puts @success + "saved your inputs to #{@filename}"
 end
+  
 
 
 #Option 4 / Called at initialisation
@@ -105,10 +106,9 @@ end
 def load_students
   puts @success + "loaded students"
   which_file?
-  open(@filename, mode = "r") do |file|
-    file.readlines.each do |line|
-      name, cohort = line.chomp.split(",")
-      student_data_to_array(name, cohort)
+  CSV.open("#{@filename}", "rb") do |csv|
+    CSV.foreach("#{@filename}") do | row|
+      student_data_to_array(row[0], row[1])
     end
   end
  end    
