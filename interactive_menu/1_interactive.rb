@@ -90,14 +90,12 @@ end
 def save_students
   puts @success + "saved students"
   which_file?
-  if File.exists?(@filename)
-    file = File.open(@filename, "w")
+  open(@filename, mode = "w") do |file|
     @students.each do |student|
       student_data = [student[:name], student[:cohort]]
       csv_line = student_data.join(", ")
       file.puts csv_line
     end
-    file.close
   end
 end
 
@@ -105,33 +103,28 @@ end
 #Option 4 / Called at initialisation
 
 def load_students
-    puts @success + "loaded students"
-    if @counter > 0
-       which_file?
-       if File.exists?(@filename)
-        file = File.open(@filename, "r")
-       else
-         puts "This file does not exist, please try again"
-         return
-       end
-    else
-        if File.exists?(@specified_file)
-          file = File.open(@specified_file, "r")
-        else
-          puts "This file does not exist, please try again"
-         return
-        end
-    end
+  puts @success + "loaded students"
+  which_file?
+  open(@filename, mode = "r") do |file|
     file.readlines.each do |line|
       name, cohort = line.chomp.split(",")
       student_data_to_array(name, cohort)
     end
-    file.close
-end
+  end
+ end    
+       
 
 def which_file?
-  puts "What file would you like to use?"
-  @filename = STDIN.gets.chomp
+  if @counter < 1
+    @filename = @specified_file
+  else
+    user_input = ""
+    until File.exist?(user_input)
+      puts "What file would you like to use?"
+      user_input= STDIN.gets.chomp
+    end
+    @filename = user_input
+  end
 end
 
 #Abstractions
@@ -148,3 +141,5 @@ end
 
 initial_load_students
 interactive_menu
+
+
