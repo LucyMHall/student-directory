@@ -1,44 +1,31 @@
 @students = []
 
-def input_students
+# Initialising Process
 
-  puts "Please enter the names of the students"
-  puts "To finish, just hit return twice"
-  name = STDIN.gets.chomp
-  
-  while !name.empty? do
-   student_data_to_array(name)
-    puts "Now we have #{@students.count} students"
-    name = STDIN.gets.chomp
-  end
-  @students
+def initial_load_students
+    filename = ARGV.first
+    return if filename.nil?
+    if File.exists?(filename)
+      load_students(filename)
+      puts "Loaded #{@students.count} from #{filename}"
+    else
+      puts "Sorry, #{filename} doesn't exist."
+      exit
+    end
 end
 
-def print_header
-  puts "The students of my cohort at Makers Academy"
-  puts "-------------"
+def interactive_menu
+    loop do
+      print_menu
+      process(STDIN.gets.chomp)
+    end
 end
 
-def print_students_list
-    @students.each { |student| puts "#{student[:name]} (#{student[:cohort]} cohort)" }
-end
-
-def print_footer
-  puts "Overall, we have #{@students.count} great students"
-end
+# Deciding Time
 
 def print_menu
-  puts "1. Input the students"
-  puts "2. Show the students"
-  puts "3. Save students"
-  puts "4. Load the list from students.csv"
-  puts "9. Exit"
-end
-
-def show_students
-  print_header
-  print_students_list
-  print_footer
+  menu = ["1. Input the students", "2. Show the students", "3. Save students", "4. Load the list from students.csv", "9. Exit"]
+  puts menu
 end
 
 def process(selection)
@@ -58,6 +45,45 @@ def process(selection)
   end 
 end
 
+
+# Option 1
+def input_students
+
+  ask_for_input
+  name = STDIN.gets.chomp
+  
+  while !name.empty? do
+   student_data_to_array(name)
+    print_student_count
+    name = STDIN.gets.chomp
+  end
+  
+  @students
+end
+
+def ask_for_input
+  puts "Please enter the names of the students"
+  puts "To finish, just hit return twice"
+end 
+
+# Option 2
+def show_students
+  print_header
+  print_students_list
+  print_student_count
+end
+
+def print_header
+  puts "The students of my cohort at Makers Academy"
+  puts "-------------"
+end
+
+def print_students_list
+    @students.each { |student| puts "#{student[:name]} (#{student[:cohort]} cohort)" }
+end
+
+
+# Option 3
 def save_students
   file = File.open("students.csv", "w")
   @students.each do |student|
@@ -68,6 +94,9 @@ def save_students
   file.close
 end
 
+
+#Option 4 / Called at initialisation
+
 def load_students(filename ="students.csv")
     file = File.open(filename, "r")
     file.readlines.each do |line|
@@ -77,29 +106,18 @@ def load_students(filename ="students.csv")
     file.close
 end
 
-def try_load_students
-    filename = ARGV.first
-    return if filename.nil?
-    if File.exists?(filename)
-      load_students(filename)
-      puts "Loaded #{@students.count} from #{filename}"
-    else
-      puts "Sorry, #{filename} doesn't exist."
-      exit
-    end
-end
 
-def interactive_menu
-    loop do
-      print_menu
-      process(STDIN.gets.chomp)
-    end
-end
+#Abstractions
+
+# used in Option 1 (Input) and Option 4 (Load Students)
 
 def student_data_to_array(name, cohort = "november")
   @students << {name: name, cohort: cohort.to_sym}
 end
 
+def print_student_count
+ puts "We now have #{@students.count} students."
+end
 
-try_load_students
+initial_load_students
 interactive_menu
