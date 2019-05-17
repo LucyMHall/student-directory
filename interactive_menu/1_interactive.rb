@@ -139,7 +139,16 @@ def print_student_count
  puts "We now have #{@students.count} students."
 end
 
+#Read Source Code
+def read_source_code
+ open_file = File.open(__FILE__, "r")
+ contents = open_file.read
+ open_file.close
+ puts contents
+end
+
 initial_load_students
+read_source_code
 interactive_menu
 
 
