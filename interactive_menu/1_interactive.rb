@@ -1,20 +1,22 @@
 @students = []
+@counter = 0
 @success = "You have successfully "
 # Initialising Process
 
 def initial_load_students
-    filename = ARGV.first
-    return if filename.nil?
-    if File.exists?(filename)
-      load_students(filename)
-      puts "Loaded #{@students.count} from #{filename}"
+    @specified_file = ARGV.first
+    return if @specified_file.nil?
+    if File.exists?(@specified_file)
+      load_students
+      puts "Loaded #{@students.count} from #{@specified_file}"
     else
-      puts "Sorry, #{filename} doesn't exist."
+      puts "Sorry, #{@specified_filename} doesn't exist."
       exit
     end
 end
 
 def interactive_menu
+    @counter += 1
     loop do
       print_menu
       process(STDIN.gets.chomp)
@@ -24,7 +26,7 @@ end
 # Deciding Time
 
 def print_menu
-  menu = ["1. Input the students", "2. Show the students", "3. Save students", "4. Load the list from students.csv", "9. Exit"]
+  menu = ["1. Input the students", "2. Show the students", "3. Save students to a file", "4. Load a file", "9. Exit"]
   puts menu
 end
 
@@ -58,7 +60,6 @@ def input_students
     print_student_count
     name = STDIN.gets.chomp
   end
-  
   @students
 end
 
@@ -88,21 +89,39 @@ end
 # Option 3
 def save_students
   puts @success + "saved students"
-  file = File.open("students.csv", "w")
-  @students.each do |student|
-    student_data = [student[:name], student[:cohort]]
-    csv_line = student_data.join(", ")
-    file.puts csv_line
+  which_file?
+  if File.exists?(@filename)
+    file = File.open(@filename, "w")
+    @students.each do |student|
+      student_data = [student[:name], student[:cohort]]
+      csv_line = student_data.join(", ")
+      file.puts csv_line
+    end
+    file.close
   end
-  file.close
 end
 
 
 #Option 4 / Called at initialisation
 
-def load_students(filename ="students.csv")
+def load_students
     puts @success + "loaded students"
-    file = File.open(filename, "r")
+    if @counter > 0
+       which_file?
+       if File.exists?(@filename)
+        file = File.open(@filename, "r")
+       else
+         puts "This file does not exist, please try again"
+         return
+       end
+    else
+        if File.exists?(@specified_file)
+          file = File.open(@specified_file, "r")
+        else
+          puts "This file does not exist, please try again"
+         return
+        end
+    end
     file.readlines.each do |line|
       name, cohort = line.chomp.split(",")
       student_data_to_array(name, cohort)
@@ -110,6 +129,10 @@ def load_students(filename ="students.csv")
     file.close
 end
 
+def which_file?
+  puts "What file would you like to use?"
+  @filename = STDIN.gets.chomp
+end
 
 #Abstractions
 
