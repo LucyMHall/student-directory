@@ -1,5 +1,5 @@
 @students = []
-
+@success = "You have successfully "
 # Initialising Process
 
 def initial_load_students
@@ -29,6 +29,7 @@ def print_menu
 end
 
 def process(selection)
+
   case selection
     when "1"
       input_students
@@ -48,7 +49,7 @@ end
 
 # Option 1
 def input_students
-
+  puts @success + "selected input student"
   ask_for_input
   name = STDIN.gets.chomp
   
@@ -68,6 +69,7 @@ end
 
 # Option 2
 def show_students
+  puts @success + "selected show students"
   print_header
   print_students_list
   print_student_count
@@ -85,6 +87,7 @@ end
 
 # Option 3
 def save_students
+  puts @success + "saved students"
   file = File.open("students.csv", "w")
   @students.each do |student|
     student_data = [student[:name], student[:cohort]]
@@ -98,6 +101,7 @@ end
 #Option 4 / Called at initialisation
 
 def load_students(filename ="students.csv")
+    puts @success + "loaded students"
     file = File.open(filename, "r")
     file.readlines.each do |line|
       name, cohort = line.chomp.split(",")
